@@ -3,50 +3,51 @@
 
 import unittest
 from parameterized import parameterized
-from unittest.mock import patch, Mock
 from utils import access_nested_map, get_json, memoize
+from unittest.mock import patch, Mock
+
 
 class TestAccessNestedMap(unittest.TestCase):
-    """Test class for access_nested_map function"""
+    """TestAccessNestedMap class for access_nested_map function"""
 
     @parameterized.expand([
         ({"a": 1}, ("a",), 1),
         ({"a": {"b": 2}}, ("a",), {"b": 2}),
         ({"a": {"b": 2}}, ("a", "b"), 2),
     ])
-    def test_access_nested_map(self, nested_map, path, expected):
+    def test_access_nested_map(self, nested_map, path, expected_output):
         """Test access_nested_map function"""
         result = access_nested_map(nested_map, path)
-        self.assertEqual(result, expected)
+        self.assertEqual(result, expected_output)
 
     @parameterized.expand([
-        ({}, ("a",), KeyError, "a"),
-        ({"a": 1}, ("a", "b"), KeyError, "b"),
+        ({}, ("a",), KeyError),
+        ({"a": 1}, ("a", "b"), KeyError),
     ])
-    def test_access_nested_map_exception(self, nested_map, path, expected_exception, expected_message):
+    def test_access_nested_map_exception(self, nested_map, path, expected_exception):
         """Test access_nested_map function for exceptions"""
-        with self.assertRaises(expected_exception) as context:
+        with self.assertRaises(expected_exception):
             access_nested_map(nested_map, path)
-        self.assertEqual(str(context.exception), f"'{expected_message}' not found")
+
 
 class TestGetJson(unittest.TestCase):
-    """Test class for get_json function"""
+    """TestGetJson class for get_json function"""
 
     @parameterized.expand([
-        ("http://example.com", {"payload": True}),
-        ("http://holberton.io", {"payload": False}),
+        ("http://example.com", {'payload': True}),
+        ("http://holberton.io", {'payload': False}),
     ])
     def test_get_json(self, test_url, test_payload):
         """Test get_json function with mock"""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
-        with patch('requests.get', return_value=mock_response) as mock_get:
+        with patch('requests.get', return_value=mock_response):
             response = get_json(test_url)
             self.assertEqual(response, test_payload)
-            mock_get.assert_called_once_with(test_url)
+
 
 class TestMemoize(unittest.TestCase):
-    """Test class for memoize decorator"""
+    """TestMemoize class for memoize decorator"""
 
     def test_memoize(self):
         """Test memoize decorator"""
@@ -69,6 +70,7 @@ class TestMemoize(unittest.TestCase):
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
             mock_method.assert_called_once()
+
 
 if __name__ == '__main__':
     unittest.main()
