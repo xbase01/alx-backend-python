@@ -20,10 +20,15 @@ class TestGithubOrgClient(unittest.TestCase):
         mocked_function.return_value = MagicMock(return_value=expected_response)
         goclient = GithubOrgClient(org)
         self.assertEqual(goclient.org(), expected_response)
-        mocked_function.assert_called_once_with("https://api.github.com/orgs/{}".format(org))
+        mocked_function.assert_called_once_with(
+            "https://api.github.com/orgs/{}".format(org)
+        )
 
     def test_public_repos_url(self):
-        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
+        with patch(
+            "client.GithubOrgClient.org",
+            new_callable=PropertyMock,
+        ) as mock_org:
             mock_org.return_value = {'repos_url': "https://api.github.com/users/google/repos"}
             self.assertEqual(
                 GithubOrgClient("google")._public_repos_url,
@@ -83,7 +88,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 ],
             )
             mock_public_repos_url.assert_called_once()
-        mock_get_json.assert called_once()
+        mock_get_json.assert_called_once()
 
     @parameterized.expand([
         ({'license': {'key': "bsd-3-clause"}}, "bsd-3-clause", True),
